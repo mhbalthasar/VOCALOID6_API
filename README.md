@@ -20,3 +20,4 @@ A api wrapper for VOCALOID6.
 
 此部分工程待上部分完成后启动。
 
+PS：YAMAHA歧视Linux。那就DIY。
