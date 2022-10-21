@@ -52,7 +52,7 @@ class VIS_VibratoBank:
         slot=self.api.VDM_VibratoBank_vibratoTemplateByType
         slot.argtypes = [c_void_p,c_int]
         slot.restype = c_void_p
-        return self.__vibratoTemplateToObject(slot(pVibratoBank,vb_Type))
+        return slot(pVibratoBank,vbType)
 
     #功能：获取颤音模板列表
     #返回值：数组，返回颤音模板句柄数组
@@ -60,7 +60,7 @@ class VIS_VibratoBank:
         ret=[]
         for i in range(0,self.__get_VibratoTemplate_Count(pVibratoBank)):
             pPtr=self.__get_VibratoTemplate_ByIndex(pVibratoBank,i)
-            ret.append(self.__vibratoTemplateToObject(pPtr))
+            ret.append(pPtr)
         return ret
 
     def __get_VibratoTemplate_Count(self,pVibratoBank):
@@ -87,9 +87,3 @@ class VIS_VibratoBank:
         slot.restype = c_wchar_p
         return slot(pVibratoTemplate)
  
-    def __vibratoTemplateToObject(self,pVibratoTemplate):
-        ret={}
-        ret["Handle"]=pVibratoTemplate
-        ret["Type"]=self.__get_VibratoTemplate_Type(pVibratoTemplate)
-        ret["Name"]=self.__get_VibratoTemplate_Name(pVibratoTemplate)
-        return ret

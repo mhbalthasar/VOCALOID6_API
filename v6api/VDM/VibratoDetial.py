@@ -22,7 +22,7 @@ class VIS_VibratoDetial:
         ret={}
         ret["Name"]=self.Get_Name(VibratoTemplateHandle)
         ret["Type"]=self.Get_Type(VibratoTemplateHandle)
-        ret["Data"]=self.__vibratoToObject(VibratoTemplateHandle)
+        ret["Data"]=self.Get_Data(VibratoTemplateHandle)
         return ret
 
     #功能：获取颤音名
@@ -39,6 +39,18 @@ class VIS_VibratoDetial:
         slot.argtypes = [c_void_p]
         slot.restype = c_ulong
         return slot(VibratoTemplateHandle)
+
+    #功能：获取颤音控制点参数
+    #返回值：对象，分为{VibratoDepth,VibratoRate}两个元素。每个元素为一个数组，数组内存在Position:Value值对
+    def Get_Data(self,VibratoTemplateHandle):
+        ret={}
+        ret["VibratoDepth"]=[]
+        for i in range(0,self.__get_VibratoDepthCount(VibratoTemplateHandle)):
+            ret["VibratoDepth"].append(self.__get_VibratoEvents(self.__get_VibratoDepth_ByIndex(VibratoTemplateHandle,i)))
+        ret["VibratoRate"]=[]
+        for i in range(0,self.__get_VibratoRateCount(VibratoTemplateHandle)):
+            ret["VibratoRate"].append(self.__get_VibratoEvents(self.__get_VibratoRate_ByIndex(VibratoTemplateHandle,i)))
+        return ret
 
     def __get_VibratoDepthCount(self,VibratoTemplateHandle):
         slot=self.api.VDM_VibratoTemplate_numDepths
@@ -75,16 +87,6 @@ class VIS_VibratoDetial:
         slot.argtypes = [c_void_p]
         slot.restype = c_int
         return slot(VibratoEventHandle)
-
-    def __vibratoToObject(self,VibratoTemplateHandle):
-        ret={}
-        ret["depth"]=[]
-        for i in range(0,self.__get_VibratoDepthCount(VibratoTemplateHandle)):
-            ret["depth"].append(self.__get_VibratoEvents(self.__get_VibratoDepth_ByIndex(VibratoTemplateHandle,i)))
-        ret["rate"]=[]
-        for i in range(0,self.__get_VibratoRateCount(VibratoTemplateHandle)):
-            ret["rate"].append(self.__get_VibratoEvents(self.__get_VibratoRate_ByIndex(VibratoTemplateHandle,i)))
-        return ret
 
     def __get_VibratoEvents(self,pVibratoEvent):
         ret={}

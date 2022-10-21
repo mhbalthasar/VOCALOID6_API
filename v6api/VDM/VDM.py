@@ -55,19 +55,9 @@ class VIS_VDM:
     def Has(self):
         slot=self.api.VDM_hasDatabaseManager
         slot.argtypes = [c_void_p]
-        slot.restype = c_char
+        slot.restype = c_int
         ret=slot(self.cPointer)
         return False if ret==0 else True
-
-    #功能：获取声库数量
-    #输入参数：是否是AI声库（BOOL）
-    #返回值：组件数量（long）
-    def NumVoiceBanks(self,isAI=True):
-        vbType=1 if isAI else 0
-        slot=self.api.VDM_DatabaseManager_numVoiceBanks
-        slot.argtypes = [c_void_p,c_int]
-        slot.restype = c_ulong
-        return slot(self.cPointer,vbType)
 
     #功能：获取默认声库句柄
     #输入参数：是否是AI声库（BOOL）
@@ -75,9 +65,9 @@ class VIS_VDM:
     def DefaultVoiceBank(self,isAI=True):
         vbType=1 if isAI else 0
         slot=self.api.VDM_DatabaseManager_defaultVoiceBank
-        slot.argtypes = [c_void_p,c_int]
+        slot.argtypes = [c_void_p]
         slot.restype = c_void_p
-        return slot(self.cPointer,LicenseIndex)
+        return slot(self.cPointer)
 
     #功能：设置为默认声库
     #输入参数：声库句柄，是否是AI声库（BOOL）
@@ -86,19 +76,19 @@ class VIS_VDM:
         vbType=1 if isAI else 0
         slot=self.api.VDM_VoiceBank_setDefault
         slot.argtypes = [c_void_p,c_int]
-        slot.restype = c_void_p
+        slot.restype = c_int
         ret=slot(pVoiceBank,vbType)
         return False if ret==0 else True
 
-    #功能：根据序号获取声库句柄
-    #输入参数：声库序号，是否是AI声库（BOOL）
-    #返回值：声库句柄
-    def GetVoiceBankByIndex(self,VoiceBankIndex,isAI=True):
-        vbType=1 if isAI else 0
-        slot=self.api.VDM_DatabaseManager_voiceBankByIndex
-        slot.argtypes = [c_void_p,c_int,c_int]
-        slot.restype = c_void_p
-        return slot(self.cPointer,VoiceBankIndex,vbType)
+    #功能：获取声库句柄
+    #输入参数：是否是AI声库（BOOL）
+    #返回值：数组，元素为声库句柄
+    def GetVoiceBanks(self,isAI=True):
+        ret=[]
+        num=self.__get_VoiceBanks_Count(isAI)
+        for i in range(0,num):
+            ret.append(self.__get_VoiceBank_ByIndex(i,isAI))
+        return ret
 
     #功能：根据声库组件序列号获取声库句柄
     #输入参数：声库组件序列号，是否是AI声库（BOOL）
@@ -121,21 +111,67 @@ class VIS_VDM:
         slot.restype = c_void_p
         return slot(self.cPointer,LangID,VoiceIndex,vbType)
 
-    #功能：获取颤音库数量
-    #返回值：组件数量（long）
-    def NumVibratoBanks(self):
+    #功能：获取颤音库句柄
+    #返回值：数组，元素为颤音库句柄
+    def GetVibratoBanks(self):
+        ret=[]
+        num=self.__get_VibratoBanks_Count()
+        for i in range(0,num):
+            ret.append(self.__get_VibratoBank_ByIndex(i))
+        return ret
+
+    #功能：获取VQM参数库句柄
+    #返回值：数组，元素为颤音库句柄
+    def GetDvqmDBs(self):
+        ret=[]
+        num=self.__get_DvqmDBs_Count()
+        for i in range(0,num):
+            ret.append(self.__get_DvqmDB_ByIndex(i))
+        return ret
+
+    #功能：根据ID获取VQM参数库句柄
+    #输入参数：ID(int)
+    #返回值：声库句柄
+    def GetDvqmDBByID(self,DvqmID):
+        slot=self.api.VDM_DatabaseManager_dvqmDBByID
+        slot.argtypes = [c_void_p,c_int]
+        slot.restype = c_void_p
+        return slot(self.cPointer,DvqmID)
+
+    def __get_DvqmDBs_Count(self):
+        slot=self.api.VDM_DatabaseManager_numDvqmDBs
+        slot.argtypes = [c_void_p]
+        slot.restype = c_ulong
+        return slot(self.cPointer)
+
+    def __get_DvqmDB_ByIndex(self,DvqmDBIndex):
+        slot=self.api.VDM_DatabaseManager_dvqmDBByIndex
+        slot.argtypes = [c_void_p,c_int]
+        slot.restype = c_void_p
+        return slot(self.cPointer,DvqmDBIndex)
+
+    def __get_VoiceBanks_Count(self,isAI=True):
+        vbType=1 if isAI else 0
+        slot=self.api.VDM_DatabaseManager_numVoiceBanks
+        slot.argtypes = [c_void_p,c_int]
+        slot.restype = c_ulong
+        return slot(self.cPointer,vbType)
+    
+    def __get_VoiceBank_ByIndex(self,VoiceBankIndex,isAI=True):
+        vbType=1 if isAI else 0
+        slot=self.api.VDM_DatabaseManager_voiceBankByIndex
+        slot.argtypes = [c_void_p,c_int,c_int]
+        slot.restype = c_void_p
+        return slot(self.cPointer,VoiceBankIndex,vbType)
+
+    def __get_VibratoBanks_Count(self):
         slot=self.api.VDM_DatabaseManager_numVibratoBanks
         slot.argtypes = [c_void_p]
         slot.restype = c_ulong
         return slot(self.cPointer)
 
-    #功能：根据序号获取颤音库句柄
-    #输入参数：颤音库序号
-    #返回值：颤音库句柄
-    def GetVibratoBankByIndex(self,VibratoBankIndex):
+    def __get_VibratoBank_ByIndex(self,VibratoBankIndex):
         slot=self.api.VDM_DatabaseManager_vibratoBank
         slot.argtypes = [c_void_p,c_int]
         slot.restype = c_void_p
         return slot(self.cPointer,VibratoBankIndex)
-
-
