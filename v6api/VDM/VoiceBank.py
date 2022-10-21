@@ -114,6 +114,23 @@ class VIS_VoiceBank:
         slot.restype = c_wchar_p
         return slot(pVoiceBank)
 
+    #功能：获取声库支持的语言
+    #返回值：数组，每个元素的内容和默认语种返回值一样。主要是跨语种AI声库有这个。
+    def Get_SupportLangIDs(self,pVoiceBank):
+        ret=[]
+        for i in range(0,self.__get_LangIDSize(pVoiceBank)):
+            ret.append(self.__get_LangIDByIndex(pVoiceBank,i))
+        return ret
+
+    #功能：获取音源支持的初始参数，编辑器内调节的参数都是在这个基础上加减的
+    #返回值：数组，每个元素以{参数名：值}方式返回键值对。已知的参数有：gen,cle,ope,bre,bri
+    def GetVoiceParameters(self,pVoiceBank):
+        ret=[]
+        for i in range(0,self.__get_VoiceParameter_Count(pVoiceBank)):
+            pPtr=self.__get_VoiceParameter_ByIndex(pVoiceBank,i)
+            ret.append({self.__get_VoiceParameter_Name(pPtr):self.__get_VoiceParameter_Value(pPtr)})
+        return ret
+
     def __get_LangIDSize(self,pVoiceBank):
         slot=self.api.VDM_VoiceBank_langIDSize
         slot.argtypes = [c_void_p]
@@ -125,14 +142,6 @@ class VIS_VoiceBank:
         slot.argtypes = [c_void_p,c_int]
         slot.restype = c_int
         return slot(pVoiceBank,Index)
-
-    #功能：获取声库支持的语言
-    #返回值：数组，每个元素的内容和默认语种返回值一样。主要是跨语种AI声库有这个。
-    def Get_SupportLangIDs(self,pVoiceBank):
-        ret=[]
-        for i in range(0,self.__get_LangIDSize(pVoiceBank)):
-            ret.append(self.__get_LangIDByIndex(pVoiceBank,i))
-        return ret
 
     def __get_VoiceParameter_Count(self,pVoiceBank):
         slot=self.api.VDM_VoiceBank_numParameters
@@ -158,12 +167,4 @@ class VIS_VoiceBank:
         slot.restype = c_int
         return slot(pParameter)
 
-    #功能：获取音源支持的初始参数，编辑器内调节的参数都是在这个基础上加减的
-    #返回值：数组，每个元素以{参数名：值}方式返回键值对。已知的参数有：gen,cle,ope,bre,bri
-    def GetVoiceParameters(self,pVoiceBank):
-        ret=[]
-        for i in range(0,self.__get_VoiceParameter_Count(pVoiceBank)):
-            pPtr=self.__get_VoiceParameter_ByIndex(pVoiceBank,i)
-            ret.append({self.__get_VoiceParameter_Name(pPtr):self.__get_VoiceParameter_Value(pPtr)})
-        return ret
 
