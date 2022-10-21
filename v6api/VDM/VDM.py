@@ -55,9 +55,8 @@ class VIS_VDM:
     def Has(self):
         slot=self.api.VDM_hasDatabaseManager
         slot.argtypes = [c_void_p]
-        slot.restype = c_int
-        ret=slot(self.cPointer)
-        return False if ret==0 else True
+        slot.restype = c_bool
+        return slot(self.cPointer)
 
     #功能：获取默认声库句柄
     #输入参数：是否是AI声库（BOOL）
@@ -76,9 +75,8 @@ class VIS_VDM:
         vbType=1 if isAI else 0
         slot=self.api.VDM_VoiceBank_setDefault
         slot.argtypes = [c_void_p,c_int]
-        slot.restype = c_int
-        ret=slot(pVoiceBank,vbType)
-        return False if ret==0 else True
+        slot.restype = c_bool
+        return slot(pVoiceBank,vbType)
 
     #功能：获取声库句柄
     #输入参数：是否是AI声库（BOOL）

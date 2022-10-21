@@ -44,9 +44,8 @@ class VIS_DSE:
     def Has(self):
         slot=self.api.VIS_DSE_HasManager
         slot.argtypes = [c_void_p]
-        slot.restype = c_char
-        ret=slot(self.cPointer)
-        return False if ret==0 else True
+        slot.restype = c_bool
+        return slot(self.cPointer)
 
     #功能：初始化管理器
     #传入参数：VDM声库管理器句柄
