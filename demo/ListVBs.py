@@ -4,11 +4,13 @@ from v6api.DSE import DSE
 from v6api.VDM import VDM
 from v6api.VDM import VoiceBank
 from v6api.VDM import VibratoBank
+from v6api.VDM import VibratoDetial
 
 dse=DSE.VIS_DSE()
 vdm=VDM.VIS_VDM()
 vdb=VoiceBank.VIS_VoiceBank()
 vib=VibratoBank.VIS_VibratoBank()
+vid=VibratoDetial.VIS_VibratoDetial()
 
 def get_vb_licenses():
     ret=[]
@@ -64,11 +66,30 @@ def echo_vb_detials(lic_arr):
 
 def get_vibratos():
     ret=[]
+    vb_Num=vdm.NumVibratoBanks()
+    for vb_Index in range(0,vb_Num):
+        vib_c=vib.VibratoBankToObject(vdm.GetVibratoBankByIndex(vb_Index))
+        vib_e=[]
+        for vib_t_i in vib_c["VibratoTemplates"]:
+            vib_e.append(vid.VibratoTemplateToObject(vib_t_i["Handle"]))
+        vib_c["VibratoTemplates"]=vib_e
+        ret.append(vib_c)
     return ret
 
 
 def echo_vibratos(Vibratos):
-    print(Vibratos)
+    show_VTN=["None","Normal1","Normal2","Normal3","Normal4","Extreme1","Extreme2","Extreme3","Extreme4","Fast1","Fast2","Fast3","Fast4","Slight1","Slight2","Slight3","Slight4"]
+    print("颤音模板库信息")
+    print("==============")
+    for dbA in Vibratos:
+        print("模板库名称：{}".format(dbA["Name"]))
+        print("安装路径：{}".format(dbA["InstallPath"]))
+        for vtA in dbA["VibratoTemplates"]:
+            print("\t颤音名:{}".format(vtA["Name"]))
+            print("\t颤音类型:{}".format(show_VTN[vtA["Type"]]))
+            print("\t颤音参数-幅度:{}个控制点".format(len(vtA["Data"]["depth"])))
+            print("\t颤音参数-频率:{}个控制点".format(len(vtA["Data"]["rate"])))
+        print('---------------')
 
 def main():
     #Create VDM

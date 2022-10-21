@@ -121,4 +121,21 @@ class VIS_VDM:
         slot.restype = c_void_p
         return slot(self.cPointer,LangID,VoiceIndex,vbType)
 
+    #功能：获取颤音库数量
+    #返回值：组件数量（long）
+    def NumVibratoBanks(self):
+        slot=self.api.VDM_DatabaseManager_numVibratoBanks
+        slot.argtypes = [c_void_p]
+        slot.restype = c_ulong
+        return slot(self.cPointer)
+
+    #功能：根据序号获取颤音库句柄
+    #输入参数：颤音库序号
+    #返回值：颤音库句柄
+    def GetVibratoBankByIndex(self,VibratoBankIndex):
+        slot=self.api.VDM_DatabaseManager_vibratoBank
+        slot.argtypes = [c_void_p,c_int]
+        slot.restype = c_void_p
+        return slot(self.cPointer,VibratoBankIndex)
+
 

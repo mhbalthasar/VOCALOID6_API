@@ -15,156 +15,81 @@ class VIS_VibratoBank:
         v6loader.free_library(self.api)
         pass
 
-#===========下面还没实现================
     #功能:解析颤音句柄到JSON
     #输入参数：颤音库句柄
     #返回值：JSON，字段定义见具体函数功能介绍
-    def VibratoBankToObject(self,pVoiceBank):
+    def VibratoBankToObject(self,pVibratoBank):
         ret={}
-        ret["CompID"]=self.Get_CompID(pVoiceBank)
-        ret["CompName"]=self.Get_CompName(pVoiceBank)
-        ret["VoiceName"]=self.Get_VoiceName(pVoiceBank)
-        ret["StyleID"]=self.Get_StyleID(pVoiceBank)
-        ret["Drp"]=self.Get_Drp(pVoiceBank)
-        ret["VoiceIndex"]=self.Get_VoiceIndex(pVoiceBank)
-        ret["GroupName"]=self.Get_Drp(pVoiceBank)
-        ret["DefaultLangID"]=self.Get_DefaultLangID(pVoiceBank)
-        ret["SupportLangIDs"]=self.Get_SupportLangIDs(pVoiceBank)
-        ret["TimbreIndex"]=self.Get_TimbreIndex(pVoiceBank)
-        ret["InstallPath"]=self.Get_InstallPath(pVoiceBank)
-        ret["VoiceParameters"]=self.GetVoiceParameters(pVoiceBank)
+        ret["Name"]=self.Get_Name(pVibratoBank)
+        ret["InstallPath"]=self.Get_InstallPath(pVibratoBank)
+        ret["VibratoTemplates"]=self.GetVibratoTemplates(pVibratoBank)
         return ret
-
-    #功能：获取声库组件序列号
-    #返回值：String
-    def Get_CompID(self,pVoiceBank):
-        slot=self.api.VDM_VoiceBank_compID
-        slot.argtypes = [c_void_p]
-        slot.restype = c_wchar_p
-        return slot(pVoiceBank)
-
-    #功能：获取声库名
-    #返回值：String
-    def Get_CompName(self,pVoiceBank):
-        slot=self.api.VDM_VoiceBank_componentName
-        slot.argtypes = [c_void_p]
-        slot.restype = c_wchar_p
-        return slot(pVoiceBank)
 
     #功能：获取音源名
     #返回值：String
-    def Get_VoiceName(self,pVoiceBank):
-        slot=self.api.VDM_VoiceBank_name
+    def Get_Name(self,pVibratoBank):
+        slot=self.api.VDM_VibratoBank_name
         slot.argtypes = [c_void_p]
         slot.restype = c_wchar_p
-        return slot(pVoiceBank)
-
-    #功能：获取演唱风格
-    #返回值：UUID串,String，对应演唱风格ID
-    def Get_StyleID(self,pVoiceBank):
-        slot=self.api.VDM_VoiceBank_defaultStyleID
-        slot.argtypes = [c_void_p]
-        slot.restype = c_wchar_p
-        return slot(pVoiceBank)
+        return slot(pVibratoBank)
 
     #功能：获取声库安装路径
     #返回值：String,拼接声库指向ddb文件，AI声库指向模型所在文件夹
-    def Get_InstallPath(self,pVoiceBank):
-        slot=self.api.VDM_VoiceBank_path
+    def Get_InstallPath(self,pVibratoBank):
+        slot=self.api.VDM_VibratoBank_path
         slot.argtypes = [c_void_p]
         slot.restype = c_wchar_p
-        return slot(pVoiceBank)
+        return slot(pVibratoBank)
 
-    #功能：歌手序号
-    #返回值：Int,同语种下歌手的Index(这个值是默认语种的)
-    def Get_VoiceIndex(self,pVoiceBank):
-        slot=self.api.VDM_VoiceBank_singerID
-        slot.argtypes = [c_void_p]
-        slot.restype = c_int
-        return slot(pVoiceBank)
-
-    #功能：歌手语种
-    #返回值：Int,0:日语，1.英语，2.韩语，3.西班牙语，4.汉语
-    def Get_DefaultLangID(self,pVoiceBank):
-        slot=self.api.VDM_VoiceBank_nativeLangID
-        slot.argtypes = [c_void_p]
-        slot.restype = c_int
-        return slot(pVoiceBank)
-
-    #功能：音色序号
-    #返回值：Int
-    def Get_TimbreIndex(self,pVoiceBank):
-        slot=self.api.VDM_VoiceBank_timbreIndex
-        slot.argtypes = [c_void_p]
-        slot.restype = c_int
-        return slot(pVoiceBank)
-
-    #功能：获取声库的发布编号
-    #返回值：String,与厂商、批号相关。同一个包里的声库是一样的
-    def Get_Drp(self,pVoiceBank):
-        slot=self.api.VDM_VoiceBank_drp
-        slot.argtypes = [c_void_p]
-        slot.restype = c_wchar_p
-        return slot(pVoiceBank)
-
-    #功能：获取声库的组名
-    #返回值：String,例如Miku的多个音色组名都是Miku
-    def Get_GroupName(self,pVoiceBank):
-        slot=self.api.VDM_VoiceBank_groupName
-        slot.argtypes = [c_void_p]
-        slot.restype = c_wchar_p
-        return slot(pVoiceBank)
-
-    def __get_LangIDSize(self,pVoiceBank):
-        slot=self.api.VDM_VoiceBank_langIDSize
-        slot.argtypes = [c_void_p]
-        slot.restype = c_int
-        return slot(pVoiceBank)
-
-    def __get_LangIDByIndex(self,pVoiceBank,Index):
-        slot=self.api.VDM_VoiceBank_langIDByIndex
-        slot.argtypes = [c_void_p,c_int]
-        slot.restype = c_int
-        return slot(pVoiceBank,Index)
-
-    #功能：获取声库支持的语言
-    #返回值：数组，每个元素的内容和默认语种返回值一样。主要是跨语种AI声库有这个。
-    def Get_SupportLangIDs(self,pVoiceBank):
-        ret=[]
-        for i in range(0,self.__get_LangIDSize(pVoiceBank)):
-            ret.append(self.__get_LangIDByIndex(pVoiceBank,i))
-        return ret
-
-    def __get_VoiceParameter_Count(self,pVoiceBank):
-        slot=self.api.VDM_VoiceBank_numParameters
+    def __get_VibratoTemplate_Count(self,pVibratoBank):
+        slot=self.api.VDM_VibratoBank_numVibratoTemplates
         slot.argtypes = [c_void_p]
         slot.restype = c_ulong
-        return slot(pVoiceBank)
+        return slot(pVibratoBank)
 
-    def __get_VoiceParameter_ByIndex(self,pVoiceBank,vP_Index):
-        slot=self.api.VDM_VoiceBank_parameter
+    def __get_VibratoTemplate_ByIndex(self,pVibratoBank,vP_Index):
+        slot=self.api.VDM_VibratoBank_vibratoTemplateByIndex
         slot.argtypes = [c_void_p,c_int]
         slot.restype = c_void_p
-        return slot(pVoiceBank,vP_Index)
+        return slot(pVibratoBank,vP_Index)
 
-    def __get_VoiceParameter_Name(self,pParameter):
-        slot=self.api.VDM_VoiceParameter_name
+    def __get_VibratoTemplate_Type(self,pVibratoTemplate):
+        slot=self.api.VDM_VibratoTemplate_type
+        slot.argtypes = [c_void_p]
+        slot.restype = c_ulong
+        return slot(pVibratoTemplate)
+
+    def __get_VibratoTemplate_Name(self,pVibratoTemplate):
+        slot=self.api.VDM_VibratoTemplate_caption
         slot.argtypes = [c_void_p]
         slot.restype = c_wchar_p
-        return slot(pParameter)
-
-    def __get_VoiceParameter_Value(self,pParameter):
-        slot=self.api.VDM_VoiceParameter_valueInt
-        slot.argtypes = [c_void_p]
-        slot.restype = c_int
-        return slot(pParameter)
-
-    #功能：获取音源支持的初始参数，编辑器内调节的参数都是在这个基础上加减的
-    #返回值：数组，每个元素以{参数名：值}方式返回键值对。已知的参数有：gen,cle,ope,bre,bri
-    def GetVoiceParameters(self,pVoiceBank):
-        ret=[]
-        for i in range(0,self.__get_VoiceParameter_Count(pVoiceBank)):
-            pPtr=self.__get_VoiceParameter_ByIndex(pVoiceBank,i)
-            ret.append({self.__get_VoiceParameter_Name(pPtr):self.__get_VoiceParameter_Value(pPtr)})
+        return slot(pVibratoTemplate)
+ 
+    def __vibratoTemplateToObject(self,pVibratoTemplate):
+        ret={}
+        ret["Handle"]=pVibratoTemplate
+        ret["Type"]=self.__get_VibratoTemplate_Type(pVibratoTemplate)
+        ret["Name"]=self.__get_VibratoTemplate_Name(pVibratoTemplate)
         return ret
 
+    #功能：根据类型获取颤音模板
+    #输入值：颤音库句柄，颤音类型(int):
+    #None=0,Normal1,Normal2,Normal3,Normal4,
+    #       Extreme1,Extreme2,Extreme3,Extreme4,
+    #       Fast1,Fast2,Fast3,Fast4,
+    #       Slight1,Slight2,Slight3,Slight4
+    #返回值：返回颤音模板句柄
+    def GetVibratoTemplateByType(self,pVibratoBank,vbType):
+        slot=self.api.VDM_VibratoBank_vibratoTemplateByType
+        slot.argtypes = [c_void_p,c_int]
+        slot.restype = c_void_p
+        return self.__vibratoTemplateToObject(slot(pVibratoBank,vb_Type))
+
+    #功能：获取颤音模板列表
+    #返回值：数组，返回颤音模板句柄数组
+    def GetVibratoTemplates(self,pVibratoBank):
+        ret=[]
+        for i in range(0,self.__get_VibratoTemplate_Count(pVibratoBank)):
+            pPtr=self.__get_VibratoTemplate_ByIndex(pVibratoBank,i)
+            ret.append(self.__vibratoTemplateToObject(pPtr))
+        return ret
