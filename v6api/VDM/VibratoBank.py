@@ -4,8 +4,8 @@ sys.path.append(os.path.join(os.path.split(os.path.realpath(__file__))[0],".."))
 import v6loader
 from ctypes import *
 
-#功能：解析VoiceBank结构体
-class VIS_VoiceBank:
+#功能：解析VibratoBank颤音数据结构体
+class VIS_VibratoBank:
     def __init__(self):
         self.vocaloid_dir=v6loader.get_vocaloid_dir()
         self.api=v6loader.load_library(self.vocaloid_dir,"vdm.dll")
@@ -15,10 +15,11 @@ class VIS_VoiceBank:
         v6loader.free_library(self.api)
         pass
 
-    #功能:解析声库句柄到JSON
-    #输入参数：声库句柄
+#===========下面还没实现================
+    #功能:解析颤音句柄到JSON
+    #输入参数：颤音库句柄
     #返回值：JSON，字段定义见具体函数功能介绍
-    def VoiceBankToObject(self,pVoiceBank):
+    def VibratoBankToObject(self,pVoiceBank):
         ret={}
         ret["CompID"]=self.Get_CompID(pVoiceBank)
         ret["CompName"]=self.Get_CompName(pVoiceBank)

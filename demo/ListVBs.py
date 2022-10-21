@@ -3,10 +3,12 @@ sys.path.append("..")
 from v6api.DSE import DSE
 from v6api.VDM import VDM
 from v6api.VDM import VoiceBank
+from v6api.VDM import VibratoBank
 
 dse=DSE.VIS_DSE()
 vdm=VDM.VIS_VDM()
 vdb=VoiceBank.VIS_VoiceBank()
+vib=VibratoBank.VIS_VibratoBank()
 
 def get_vb_licenses():
     ret=[]
@@ -23,14 +25,50 @@ def echo_vb_licenses(lic_arr):
     for lic in lic_arr:
         print("{}\t\t{}\t\t{}".format("Application" if lic["CompType"]==1 else "VoiceBank",lic["CompID"],lic["CompName"]))
 
-def get_vb_detial(lic_arr):
+def get_vb_detials():
     ret=[]
-    vb_Num_AI=vdm.NumVoiceBanks(True)
-#   vb_Num_SE=vdm.NumVoiceBanks(False)
-    for vb_Index in range(0,vb_Num_AI):
-        print(vdb.VoiceBankToObject(vdm.GetVoiceBankByIndex(vb_Index,True)))
-    pass
+    vb_Num=vdm.NumVoiceBanks(True)
+    for vb_Index in range(0,vb_Num):
+        dbA=vdb.VoiceBankToObject(vdm.GetVoiceBankByIndex(vb_Index,True))
+        dbA["isAI"]=True
+        ret.append(dbA)
+    vb_Num=vdm.NumVoiceBanks(False)
+    for vb_Index in range(0,vb_Num):
+        dbA=vdb.VoiceBankToObject(vdm.GetVoiceBankByIndex(vb_Index,False))
+        dbA["isAI"]=False
+        ret.append(dbA)
+    return ret
 
+def echo_vb_detials(lic_arr):
+    show_Lang=["日语","英语","韩语","西班牙语","汉语"]
+    print("当前声库信息")
+    print("==============")
+    ret=[]
+    for dbA in lic_arr:
+        print("音源名：{}".format(dbA["VoiceName"]))
+        print("音源类型：{}".format("AI声库" if dbA["isAI"] else "拼接声库"))
+        print("声库名：{}".format(dbA["CompName"]))
+        print("声库序列号：{}".format(dbA["CompID"]))
+        print("演唱风格：{}".format(dbA["StyleID"]))
+        print("安装路径：{}".format(dbA["InstallPath"]))
+        print("音色序号：{}".format(dbA["TimbreIndex"]))
+        print("默认语言：{}".format(show_Lang[dbA["DefaultLangID"]]))
+        print("音源序号：{}".format(dbA["VoiceIndex"]))
+        spL=[]
+        for lid in dbA["SupportLangIDs"]:
+            spL.append(show_Lang[lid])
+        print("支持的语言：{}".format(spL))
+        print("音源初始参数: {}".format(dbA["VoiceParameters"]))
+        print("-----------------")
+
+
+def get_vibratos():
+    ret=[]
+    return ret
+
+
+def echo_vibratos(Vibratos):
+    print(Vibratos)
 
 def main():
     #Create VDM
@@ -49,12 +87,19 @@ def main():
         print("DSE拼接合成引擎初始化失败")
         return destroy()
 
-    #GetVB_Licenses
+    #读取并显示全部YAMAHA组件
     Licenses=get_vb_licenses()
     echo_vb_licenses(Licenses)
 
-    #GetVB_Detial
-    License_Details=get_vb_detial(Licenses)
+    print("")
+    #读取并显示全部可用声库
+    VB_Detials=get_vb_detials()
+    echo_vb_detials(VB_Detials)
+
+    print("")
+    #读取并显示全部颤音配置
+    Vibratos=get_vibratos()
+    echo_vibratos(Vibratos)
 
     #Halt DSE
     dse.Terminate()
