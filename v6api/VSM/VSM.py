@@ -1,16 +1,3 @@
-#SequenceManager = WVSMModuleIF.CreateManager(Yamaha.VOCALOID.Identifier.Application.AppID, Assembly.GetExecutingAssembly().GetName().Version!.ToString());
-#if (SequenceManager == null)
-#{#
-#	MessageBoxDeliverer.GeneralError(splash, Yamaha.VOCALOID.Properties.Resources.MsgBox_VSMInitialization_Error);
-#	return ModuleResult.Fail;
-#}
-#SequenceManager.SetDatabaseManager(DatabaseManager);
-#SequenceManager.SetDSEManager(DSEManager);
-#if (SequenceManager != null)
-#{#
-#	SequenceManager.CacheCapacity = CacheCapacity.GetBytes(CacheCapacity.OptionFromUserSettings);
-#}
-
 import sys
 import os
 sys.path.append(os.path.join(os.path.split(os.path.realpath(__file__))[0],".."))
@@ -156,7 +143,7 @@ class VIS_VSM:
         return ret
         
     #功能：打开一个V1的Midi的序列，SMF
-    #传入参数：文件地址[必须]，VSQX解析Schema文件路径，SEQ基本属性-采样率、SEQ基本属性-最大轨道数、SEQ基本属性-最大撤销数
+    #传入参数：文件地址[必须]，文本代码页，SEQ基本属性-采样率、SEQ基本属性-最大轨道数、SEQ基本属性-最大撤销数
     #返回值：序列句柄
     def OpenLegacySequence(self,FilePath,codePage=932,channelAsTrack=True,SeqSamplingRate=44100,SeqMaxNumTracks=32,SeqMaxUndoCount=0):
         SeqData=[SeqSamplingRate,SeqMaxNumTracks,SeqMaxUndoCount]
@@ -165,4 +152,4 @@ class VIS_VSM:
         slot.argtypes = [c_void_p,c_wchar_p,POINTER(self.__struct_SequenceData),c_uint,c_bool]
         ret=slot(self.cPointer,c_wchar_p(FilePath),ptrSeqData,codePage,channelAsTrack)
         return ret
-        
+
