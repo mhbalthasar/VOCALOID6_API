@@ -37,6 +37,23 @@ class VIS_Sequence:
             self.cPointer=0
         return ret
 
+    #功能：获取Title
+    #返回值：STRING
+    def Get_Title(self):
+        slot=self.api.VIS_VSM_WIVSMSequence_title
+        slot.argtypes = [c_void_p]
+        slot.restype = c_wchar_p
+        ret=slot(self.cPointer)
+        return ret
+
+    #功能：获取Title
+    #返回值：STRING
+    def Set_Title(self,title):
+        slot=self.api.VIS_VSM_WIVSMSequence_setTitle
+        slot.argtypes = [c_void_p,c_wchar_p]
+        ret=slot(self.cPointer,c_wchar_p(title))
+        return ret
+
     #功能：保存一个SMFMidi文件
     #传入参数：文件目标地址[必须]，是否Utf8（非UTF8只能存ShiftJIS）
     #返回值：BOOL
@@ -73,6 +90,12 @@ class VIS_Sequence:
             seqZip.close()
         return ret
 
+    def LastError(self):
+        slot=self.api.VIS_VSM_WIVSMSequence_lastError
+        slot.argtypes = []
+        slot.restype = c_int
+        return slot()
+
     #功能：获取Track列表
     #返回值：数组，元素为Track句柄
     def Get_Tracks(self):
@@ -106,14 +129,15 @@ class VIS_Sequence:
     def GetMaxTrackNum(self):
         slot=self.api.VIS_VSM_WIVSMSequence_maxNumTrack
         slot.argtypes = [c_void_p]
-        slot.restype = c_ulong
+        slot.restype = c_int
         return slot(self.cPointer)
 
     def __get_Track_Count(self):
         slot=self.api.VIS_VSM_WIVSMSequence_numTrack
         slot.argtypes = [c_void_p]
-        slot.restype = c_ulong
-        return slot(self.cPointer)
+        slot.restype = c_int
+        ret = slot(self.cPointer)
+        return ret
 
     def __get_Track_ByIndex(self,Index):
         slot=self.api.VIS_VSM_WIVSMSequence_track

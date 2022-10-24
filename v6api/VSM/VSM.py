@@ -13,8 +13,16 @@ from tempfile import TemporaryDirectory
 class VIS_VSM:
     #定义结构体类型
     class __struct_SequenceData(Structure):
-        _fields_ = [("SamplingRate",c_int),("MaxNumTracks",c_ulong),("MaxUndoCount",c_ulong)]
-
+        _fields_ = [("SamplingRate",c_longlong),("MaxNumTracks",c_longlong),("MaxUndoCount",c_longlong)]
+#
+#ARG3：
+#44 AC 00 00 00 00 00 00 20 00 00 00 00 00 00
+#00 00 00 00 00 00 00 00 
+#
+#NOW:
+#
+#44 AC 00 00 20 00 00 00 00 00 00 00
+#
     def __init__(self):
         self.vocaloid_dir=v6loader.get_vocaloid_dir()
         self.api=v6loader.load_library(self.vocaloid_dir,"vsm.dll")
@@ -32,7 +40,7 @@ class VIS_VSM:
     #功能：创建对象
     #输入参数：appID(string),appVersion(string)，均可使用默认值
     #返回值：BOOL
-    def Create(self,appID="VOCALOID6",appVersion="6.0.1"):
+    def Create(self,appID="VOCALOID6",appVersion="6.0.0"):
         slot = self.api.VIS_VSM_WVSMModuleIF_createManager
         slot.argtypes = [c_wchar_p,c_wchar_p]
         slot.restype = c_void_p
@@ -88,21 +96,115 @@ class VIS_VSM:
 
     #功能：获取上一个错误代码
     #返回值：int,枚举取值如下：
-    #NoError=0,OutOfMemory=1,InvalidArgument=2,FailedToCreateEditCommand,ObjectNotFound,ParentNotFound,InvalidPath,FailedToCopyFile,FileAlreadyExists,ObjectIsProtected,FailedToLoadVSM,CannotFindUid,
-	#FailedToGetHomeDir,FailedToCreateTempDir,FailedToCreateCachesDir,FailedToCreateTempProject,FailedToMoveTempProject,FailedToCreateOutputDir,FailedToCreateSequenceUUID,FailedToCreateSequenceTempDir,InvalidSamplingRate,FailedToRemoveSameTimeEvent,
-	#MaxNumTrack,InvalidTrackType,InvalidTrackName,MidiPartStartAbsolutePosTooSmall,MidiPartStartAbsolutePosTooLarge,MidiPartEndAbsolutePosTooLarge,MidiPartDurationTooShort,MidiPartDurationTooLong,InvalidDivideMidiPartPos,JoinMidiPartOfDifferentParent,EditCommandsStaging,
-	#InvalidPartName,ControllerRelativePosTooSmall,ControllerRelativePosTooLarge,ControllerAbsolutePosTooSmall,ControllerAbsolutePosTooLarge,CannotFindTargetTrack,CannotFindTopController,InvalidControllerType,NoteStartRelativePosTooSmall,NoteStartRelativePosTooLarge,
-	#NoteStartAbsolutePosTooSmall,NoteStartAbsolutePosTooLarge,NoteEndRelativePosTooLarge,NoteEndAbsolutePosTooLarge,
-	#NoteDurationTooShort,NoteDurationTooLong,InvalidNoteNumber,InvalidNoteVelocity,InvalidLyric,InvalidPhoneme,InvalidLangID,VibratoDurationTooShort,VibratoDurationTooLong,VibratoEventRelativePosTooSmall,VibratoEventRelativePosTooLarge,InvalidVibratoEventType,NoteEventsNotFound,MidiPartIsDisable,
-	#SequenceNotFound,SequenceTempDirPathNotFound,DatabaseManagerNotFound,VoiceBankNotFound,FailedToCreateVVoiceTable,FailedToGetDseModule,FailedToCreateDSE,FailedToStartDSE,FailedToOpenRenderedFile,FailedToCreateDseMidiEventsBuffer,FailedToCreateDseWaveBuffer,
-	#FailedToDseDoStepSynthesis,FailedToDseDoExportScore,FailedToCreateNRPN_Singer,PartialRendererNotCreated,DsePartialSynthNotStarted,FailedToResetDsePartialSynth,DuplicatedEffectID,DuplicatedEffectValueName,MidiEffectIsDisabled,FailedToInitVsqParserModule,FailedToCreateVsqParser,
-	#InvalidVsqxSchemaDirPath,FailedToParseVsqx,VsqObjTreeNotFound,InvalidVsqFormat,VsqRootNodeNotFound,VsqSequenceNotFound,VsqMasterTrackNotFound,VsqTempoNotFound,VsqTimeSigNotFound,VsqMixerNotFound,FailedToCreateJsonDoc,FailedToOpenJsonFile,
-	#FailedToParseJson,InvalidJsonDocRootType
+    #[VSMResult]
     def LastError(self):
-        slot=self.api. VIS_VSM_WVSMModuleIF_lastError
+        slot=self.api.VIS_VSM_WVSMModuleIF_lastError
         slot.argtypes = []
         slot.restype = c_int
         return slot()
+
+    def VSMResult(self,id):
+        map=["NoError",
+            "OutOfMemory",
+            "InvalidArgument",
+            "FailedToCreateEditCommand",
+            "ObjectNotFound",
+            "ParentNotFound",
+            "InvalidPath",
+            "FailedToCopyFile",
+            "FileAlreadyExists",
+            "ObjectIsProtected",
+            "FailedToLoadVSM",
+            "CannotFindUid",
+            "FailedToGetHomeDir",
+            "FailedToCreateTempDir",
+            "FailedToCreateCachesDir",
+            "FailedToCreateTempProject",
+            "FailedToMoveTempProject",
+            "FailedToCreateOutputDir",
+            "FailedToCreateSequenceUUID",
+            "FailedToCreateSequenceTempDir",
+            "InvalidSamplingRate",
+            "FailedToRemoveSameTimeEvent",
+            "MaxNumTrack",
+            "InvalidTrackType",
+            "InvalidTrackName",
+            "MidiPartStartAbsolutePosTooSmall",
+            "MidiPartStartAbsolutePosTooLarge",
+            "MidiPartEndAbsolutePosTooLarge",
+            "MidiPartDurationTooShort",
+            "MidiPartDurationTooLong",
+            "InvalidDivideMidiPartPos",
+            "JoinMidiPartOfDifferentParent",
+            "EditCommandsStaging",
+            "InvalidPartName",
+            "ControllerRelativePosTooSmall",
+            "ControllerRelativePosTooLarge",
+            "ControllerAbsolutePosTooSmall",
+            "ControllerAbsolutePosTooLarge",
+            "CannotFindTargetTrack",
+            "CannotFindTopController",
+            "InvalidControllerType",
+            "NoteStartRelativePosTooSmall",
+            "NoteStartRelativePosTooLarge",
+            "NoteStartAbsolutePosTooSmall",
+            "NoteStartAbsolutePosTooLarge",
+            "NoteEndRelativePosTooLarge",
+            "NoteEndAbsolutePosTooLarge",
+            "NoteDurationTooShort",
+            "NoteDurationTooLong",
+            "InvalidNoteNumber",
+            "InvalidNoteVelocity",
+            "InvalidLyric",
+            "InvalidPhoneme",
+            "InvalidLangID",
+            "VibratoDurationTooShort",
+            "VibratoDurationTooLong",
+            "VibratoEventRelativePosTooSmall",
+            "VibratoEventRelativePosTooLarge",
+            "InvalidVibratoEventType",
+            "NoteEventsNotFound",
+            "MidiPartIsDisable",
+            "SequenceNotFound",
+            "SequenceTempDirPathNotFound",
+            "DatabaseManagerNotFound",
+            "VoiceBankNotFound",
+            "FailedToCreateVVoiceTable",
+            "FailedToGetDseModule",
+            "FailedToCreateDSE",
+            "FailedToStartDSE",
+            "FailedToOpenRenderedFile",
+            "FailedToCreateDseMidiEventsBuffer",
+            "FailedToCreateDseWaveBuffer",
+            "FailedToDseDoStepSynthesis",
+            "FailedToDseDoExportScore",
+            "FailedToCreateNRPN_Singer",
+            "PartialRendererNotCreated",
+            "DsePartialSynthNotStarted",
+            "FailedToResetDsePartialSynth",
+            "DuplicatedEffectID",
+            "DuplicatedEffectValueName",
+            "MidiEffectIsDisabled",
+            "FailedToInitVsqParserModule",
+            "FailedToCreateVsqParser",
+            "InvalidVsqxSchemaDirPath",
+            "FailedToParseVsqx",
+            "VsqObjTreeNotFound",
+            "InvalidVsqFormat",
+            "VsqRootNodeNotFound",
+            "VsqSequenceNotFound",
+            "VsqMasterTrackNotFound",
+            "VsqTempoNotFound",
+            "VsqTimeSigNotFound",
+            "VsqMixerNotFound",
+            "FailedToCreateJsonDoc",
+            "FailedToOpenJsonFile",
+            "FailedToParseJson",
+            "InvalidJsonDocRootType"]
+        if id>=0 and id<len(map):
+            return map[id]
+        else:
+            return id
 
     #功能：创建一个空白的序列
     #传入参数：SEQ基本属性：采样率、最大轨道数、最大撤销数
@@ -112,6 +214,7 @@ class VIS_VSM:
         ptrSeqData=self.__struct_SequenceData(*SeqData)
         slot=self.api.VIS_VSM_WIVSMSequenceManager_createSequence
         slot.argtypes = [c_void_p,POINTER(self.__struct_SequenceData)]
+        slot.restype = c_void_p
         ret=slot(self.cPointer,ptrSeqData)
         return ret
 
@@ -135,10 +238,11 @@ class VIS_VSM:
     def OpenSequenceVSQX(self,FilePath,vsqxSchemaDirPath="",SeqSamplingRate=44100,SeqMaxNumTracks=32,SeqMaxUndoCount=0):
         if vsqxSchemaDirPath=="":
             vsqxSchemaDirPath=self.vocaloid_dir;
-        SeqData=[SeqSamplingRate,SeqMaxNumTracks,SeqMaxUndoCount]
+        SeqData=[c_longlong(SeqSamplingRate),c_longlong(SeqMaxNumTracks),c_longlong(SeqMaxUndoCount)]
         ptrSeqData=self.__struct_SequenceData(*SeqData)
         slot=self.api.VIS_VSM_WIVSMSequenceManager_openSequence
         slot.argtypes = [c_void_p,c_wchar_p,c_wchar_p,POINTER(self.__struct_SequenceData)]
+        slot.restype = c_void_p
         ret=slot(self.cPointer,c_wchar_p(FilePath),c_wchar_p(vsqxSchemaDirPath),ptrSeqData)
         return ret
         
@@ -150,6 +254,7 @@ class VIS_VSM:
         ptrSeqData=self.__struct_SequenceData(*SeqData)
         slot=self.api.VIS_VSM_WIVSMSequenceManager_openLegacySequence
         slot.argtypes = [c_void_p,c_wchar_p,POINTER(self.__struct_SequenceData),c_uint,c_bool]
+        slot.restype = c_void_p
         ret=slot(self.cPointer,c_wchar_p(FilePath),ptrSeqData,codePage,channelAsTrack)
         return ret
 

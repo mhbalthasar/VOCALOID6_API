@@ -1,7 +1,8 @@
 import os
 import sys
-sys.path.append("..")
+sys.path.append(os.path.join(os.path.split(os.path.realpath(__file__))[0],".."))
 import argparse
+import v6api.v6loader as v6loader
 
 from v6api.DSE import DSE
 from v6api.VDM import VDM
@@ -17,6 +18,8 @@ from v6api.VSM import Part
 gObj={}
 gData={}
 def Initalize():
+    v6loader.set_dll_directory()
+
     vdm=VDM.VIS_VDM()
     if vdm.Create()==0:
         print("VDM声库管理器加载失败")

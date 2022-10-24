@@ -83,7 +83,7 @@ class VIS_Track:
     def __get_Part_Count(self):
         slot=self.api.VIS_VSM_WIVSMTrack_numPart
         slot.argtypes = [c_void_p]
-        slot.restype = c_ulong
+        slot.restype = c_int
         return slot(self.cPointer)
 
     def __get_Part_ByIndex(self,Index):

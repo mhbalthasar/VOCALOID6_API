@@ -38,6 +38,19 @@ def get_vocaloid_dir():
                 return vdir
     return None
 
+def set_dll_directory():
+    plat = platform.system()
+    if plat == 'Windows':
+        base_dir=get_vocaloid_dir()
+        klb=ctypes.CDLL("Kernel32.dll")
+        slot = klb.SetDllDirectoryW
+        slot.argtypes = [ctypes.c_wchar_p]
+        slot.restype = ctypes.c_bool
+        ret=slot(base_dir)
+        _ctypes.FreeLibrary(klb._handle)
+        return ret
+    return False
+
 def load_library(base_dir,file_name):
     dll_file=os.path.join(base_dir,file_name)
     return ctypes.CDLL(dll_file)
